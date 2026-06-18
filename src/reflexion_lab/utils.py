@@ -11,6 +11,15 @@ def normalize_answer(text: str) -> str:
     text = re.sub(r"\s+", " ", text)
     return text
 
+def estimate_tokens(*texts: str) -> int:
+    """Ước lượng số token theo heuristic ~4 ký tự/token.
+
+    Dùng khi chạy mock (không có LLM thật để lấy usage). Thay cho con số
+    hardcode trước đây — vẫn phản ánh độ dài thực của prompt/answer.
+    """
+    total_chars = sum(len(t) for t in texts if t)
+    return max(1, total_chars // 4)
+
 def load_dataset(path: str | Path) -> list[QAExample]:
     raw = json.loads(Path(path).read_text(encoding="utf-8"))
     return [QAExample.model_validate(item) for item in raw]
